@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeHelper.AI", "CodeHelper.AI\CodeHelper.AI.csproj", "{4F10C8C6-B97A-42D2-B044-3624D7F74841}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonStreamingParser", "JsonStreamingParser\JsonStreamingParser.csproj", "{856AABD9-332C-47BC-B7EA-360C6D63446D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F10C8C6-B97A-42D2-B044-3624D7F74841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F10C8C6-B97A-42D2-B044-3624D7F74841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F10C8C6-B97A-42D2-B044-3624D7F74841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F10C8C6-B97A-42D2-B044-3624D7F74841}.Release|Any CPU.Build.0 = Release|Any CPU
+		{856AABD9-332C-47BC-B7EA-360C6D63446D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{856AABD9-332C-47BC-B7EA-360C6D63446D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{856AABD9-332C-47BC-B7EA-360C6D63446D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{856AABD9-332C-47BC-B7EA-360C6D63446D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C3EE9D4-BD82-4815-840A-075AF85EB60E}
+	EndGlobalSection
+EndGlobal
