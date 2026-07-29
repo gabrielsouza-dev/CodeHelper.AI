@@ -159,9 +159,6 @@ public sealed class JsonFieldStreamer
                 _escape = true;
                 return;
 
-            case ',':
-                return;
-
             default:
                 if (_readingArrayItem)
                     Console.Write(c);
