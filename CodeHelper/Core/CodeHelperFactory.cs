@@ -1,6 +1,5 @@
-﻿using CodeHelper.AI.Core.Options;
+﻿using CodeHelper.Core.Options;
 using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Options;
 using OpenAI;
 using System.ClientModel;
 

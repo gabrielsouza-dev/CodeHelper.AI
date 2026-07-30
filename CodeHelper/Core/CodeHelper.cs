@@ -24,8 +24,9 @@ public class CodeHelper : ICodeHelper
 
     public async IAsyncEnumerable<string> RunAsync(string input)
     {
-        var session = new CodeHelperSession();
-        
+        var session = await Agent.CreateSessionAsync();
+
+
         var messages = new List<ChatMessage>();
         messages.Add(new(ChatRole.User, input));
 
