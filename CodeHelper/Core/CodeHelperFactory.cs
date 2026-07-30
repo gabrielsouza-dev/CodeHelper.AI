@@ -15,6 +15,18 @@ public static class CodeHelperFactory
         return options;
     }
 
+    public static AgentOptions SelectPrincipalModel(this AgentOptions options, string model)
+    {
+        options.AgentModel = model;
+        return options;
+    }
+
+    public static AgentOptions SelectRouterModel(this AgentOptions options, string model)
+    {
+        options.RouterModel = model;
+        return options;
+    }
+
     public static CodeHelper Build(this AgentOptions options)
     {
         var instruction = GetCodeHelperInstruction(options.ProgrammingLanguage);
@@ -27,7 +39,7 @@ public static class CodeHelperFactory
             });
 
         IChatClient chatClient = openAiClient
-            .GetChatClient(options.Model)
+            .GetChatClient(options.AgentModel)
             .AsIChatClient();
 
         var agent = chatClient.AsAIAgent(instructions: instruction, name: "CodeHelper");

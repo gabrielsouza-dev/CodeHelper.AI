@@ -1,9 +1,26 @@
 ﻿using CodeHelper.Core;
 using CodeHelper.Core.Models;
 using JsonStreamingParser;
+using Microsoft.Extensions.Configuration;
 
-var apiKey = "sk-or...";
-var apiUrl = "https://openrouter.ai/api/v1";
+var basePath =
+#if DEBUG
+    Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..");
+#else
+    AppContext.BaseDirectory;
+#endif
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(basePath)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var settings = configuration
+    .GetSection("CodeHelperSettings")
+    .Get<CodeHelperSettings>();
+
+if (settings is null)
+    throw new ArgumentNullException(nameof(settings));
 
 ConsoleWriter.Header();
 Console.Write("Linguagem de programação: ");
@@ -18,7 +35,9 @@ if (string.IsNullOrWhiteSpace(programmingLanguage))
 }
 
 var codeHelper = CodeHelperFactory
-    .ConfigureClient(apiKey, apiUrl)
+    .ConfigureClient(settings.ApiKey, settings.ApiUrl)
+    .SelectPrincipalModel(settings.AgentModel)
+    .SelectRouterModel(settings.RouterModel)
     .WithLanguage(programmingLanguage)
     .Build();
 

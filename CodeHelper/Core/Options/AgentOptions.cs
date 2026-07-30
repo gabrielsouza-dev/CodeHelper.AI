@@ -4,7 +4,8 @@ public class AgentOptions
 {
     public string ApiKey { get; set; } = string.Empty;
     public string ApiUrl { get; set; } = "https://openrouter.ai/api/v1";
-    public string Model { get; set; } = "openai/gpt-4o-mini";
+    public string AgentModel { get; set; } = "openai/gpt-4.1-mini";
+    public string RouterModel { get; set; } = "openai/gpt-4.1-nano";
     public string ProgrammingLanguage { get; set; } = "C#";
     public AgentOptions(string apiKey, string? apiUrl = null)
     {
