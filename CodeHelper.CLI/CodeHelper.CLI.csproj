@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-  	<Content Include="Instructions\**\*.md">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
-  </ItemGroup>
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -14,12 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Agents.AI" Version="1.15.0" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="10.8.3" />
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.3" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\CodeHelper\CodeHelper.csproj" />
     <ProjectReference Include="..\JsonStreamingParser\JsonStreamingParser.csproj" />
   </ItemGroup>
 

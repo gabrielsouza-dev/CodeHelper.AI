@@ -5,6 +5,7 @@ using JsonStreamingParser;
 var apiKey = "sk-or...";
 var apiUrl = "https://openrouter.ai/api/v1";
 
+ConsoleWriter.Header();
 Console.Write("Linguagem de programação: ");
 var programmingLanguage = Console.ReadLine();
 if (string.IsNullOrWhiteSpace(programmingLanguage))
