@@ -1,4 +1,5 @@
-﻿using CodeHelper.Core.Options;
+﻿using CodeHelper.Core.Agents;
+using CodeHelper.Core.Options;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using System.ClientModel;
@@ -29,7 +30,8 @@ public static class CodeHelperFactory
 
     public static CodeHelper Build(this AgentOptions options)
     {
-        var instruction = GetCodeHelperInstruction(options.ProgrammingLanguage);
+        var codehelperInstrictions = GetCodeHelperInstruction(options.ProgrammingLanguage, "CodeHelper");
+        var RouterInstrictions = GetCodeHelperInstruction(options.ProgrammingLanguage, "RouterAgent");
 
         var openAiClient = new OpenAIClient(
             new ApiKeyCredential(options.ApiKey),
@@ -42,14 +44,18 @@ public static class CodeHelperFactory
             .GetChatClient(options.AgentModel)
             .AsIChatClient();
 
-        var agent = chatClient.AsAIAgent(instructions: instruction, name: "CodeHelper");
+        var codeHelperChat = chatClient.AsAIAgent(instructions: codehelperInstrictions, name: "CodeHelper");
+        var codeHelper = new CodeHelperAgent(codeHelperChat);
 
-        return new(agent);
+        var routerChat = chatClient.AsAIAgent(instructions: RouterInstrictions, name: "RouterAgent");
+        var routerAgent = new RouterAgent(routerChat);
+
+        return new(codeHelper, routerAgent);
     }
 
-    private static string GetCodeHelperInstruction(string programmingLanguage)
+    private static string GetCodeHelperInstruction(string programmingLanguage, string InstructionName)
     {
-        var instructionsPath = Path.Combine(AppContext.BaseDirectory, "Instructions", "CodeHelper.md");
+        var instructionsPath = Path.Combine(AppContext.BaseDirectory, "Instructions", $"{InstructionName}.md");
         var instruction = File.ReadAllText(instructionsPath);
         instruction = string.Format(instruction, programmingLanguage);
 

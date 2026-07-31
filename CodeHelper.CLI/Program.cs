@@ -53,13 +53,20 @@ do
     var explanation = new JsonFieldStreamer(nameof(CodeHelperResponse.Explanation), ConsoleColor.Gray);
     var code = new JsonFieldStreamer(nameof(CodeHelperResponse.Code), ConsoleColor.Green);
     var notes = new JsonFieldStreamer(nameof(CodeHelperResponse.Notes), ConsoleColor.Yellow);
-
-    await foreach (var chunk in codeHelper.RunAsync(input))
+    try
     {
-        title.ProcessChunk(chunk);
-        code.ProcessChunk(chunk);
-        explanation.ProcessChunk(chunk);
-        notes.ProcessChunk(chunk);
+        await foreach (var chunk in codeHelper.RunAsync(input))
+        {
+            title.ProcessChunk(chunk);
+            code.ProcessChunk(chunk);
+            explanation.ProcessChunk(chunk);
+            notes.ProcessChunk(chunk);
+        }
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+
     Console.WriteLine();
 } while (true);

@@ -1,6 +1,6 @@
 ﻿namespace CodeHelper.Core.Interfaces;
 
-public interface ICodeHelper
+public interface ICodeHelperAgent
 {
     IAsyncEnumerable<string> RunAsync(string input);
 }
