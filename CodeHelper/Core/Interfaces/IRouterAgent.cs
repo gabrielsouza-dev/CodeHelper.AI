@@ -4,5 +4,5 @@ namespace CodeHelper.Core.Interfaces;
 
 public interface IRouterAgent
 {
-    Task<AgentRouterResponse?> RunAsync(string input);
+    Task<AgentRouterResponse?> RunAsync(string input, CancellationToken ct);
 }

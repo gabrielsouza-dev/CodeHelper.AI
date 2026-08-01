@@ -1,7 +1,10 @@
 ﻿using CodeHelper.Core;
-using CodeHelper.Core.Models;
-using JsonStreamingParser;
+using CodeHelper.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 var basePath =
 #if DEBUG
@@ -10,63 +13,35 @@ var basePath =
     AppContext.BaseDirectory;
 #endif
 
-var configuration = new ConfigurationBuilder()
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.Logging.SetMinimumLevel(LogLevel.Warning);
+
+builder.Configuration.Sources.Clear();
+
+builder.Configuration
     .SetBasePath(basePath)
-    .AddJsonFile("appsettings.json")
-    .Build();
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddEnvironmentVariables();
 
-var settings = configuration
-    .GetSection("CodeHelperSettings")
-    .Get<CodeHelperSettings>();
+builder.Services.Configure<CodeHelperSettings>(
+    builder.Configuration.GetSection("CodeHelperSettings"));
 
-if (settings is null)
-    throw new ArgumentNullException(nameof(settings));
-
-ConsoleWriter.Header();
-Console.Write("Linguagem de programação: ");
-var programmingLanguage = Console.ReadLine();
-if (string.IsNullOrWhiteSpace(programmingLanguage))
+builder.Services.AddSingleton<ICodeHelper>((services) =>
 {
-    Console.WriteLine();
-    Console.WriteLine("Linguagem de programação não informada!");
-    Console.WriteLine("Pressione qualquer tecla para encerrar..");
-    Console.ReadKey();
-    return;
-}
+    var settings = services.GetRequiredService<IOptions<CodeHelperSettings>>().Value;
 
-var codeHelper = CodeHelperFactory
-    .ConfigureClient(settings.ApiKey, settings.ApiUrl)
-    .SelectPrincipalModel(settings.AgentModel)
-    .SelectRouterModel(settings.RouterModel)
-    .WithLanguage(programmingLanguage)
-    .Build();
+    var codeHelper = CodeHelperFactory
+        .ConfigureClient(settings.ApiKey, settings.ApiUrl)
+        .SelectPrincipalModel(settings.AgentModel)
+        .SelectRouterModel(settings.RouterModel)
+        .WithLanguage(settings.ProgrammingLanguage)
+        .Build();
 
-do
-{
-    Console.Write("Input: ");
-    var input = Console.ReadLine();
-    Console.WriteLine();
-    if (string.IsNullOrWhiteSpace(input))
-        return;
+    return codeHelper;
+});
 
-    var title = new JsonFieldStreamer(nameof(CodeHelperResponse.Title), ConsoleColor.Cyan);
-    var explanation = new JsonFieldStreamer(nameof(CodeHelperResponse.Explanation), ConsoleColor.Gray);
-    var code = new JsonFieldStreamer(nameof(CodeHelperResponse.Code), ConsoleColor.Green);
-    var notes = new JsonFieldStreamer(nameof(CodeHelperResponse.Notes), ConsoleColor.Yellow);
-    try
-    {
-        await foreach (var chunk in codeHelper.RunAsync(input))
-        {
-            title.ProcessChunk(chunk);
-            code.ProcessChunk(chunk);
-            explanation.ProcessChunk(chunk);
-            notes.ProcessChunk(chunk);
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-    }
+builder.Services.AddHostedService<ConsoleWorker>();
 
-    Console.WriteLine();
-} while (true);
+var app = builder.Build();
+await app.RunAsync();

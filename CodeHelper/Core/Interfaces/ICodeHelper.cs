@@ -2,5 +2,5 @@
 
 public interface ICodeHelper
 {
-    IAsyncEnumerable<string> RunAsync(string input);
+    IAsyncEnumerable<string> RunAsync(string input, CancellationToken ct);
 }

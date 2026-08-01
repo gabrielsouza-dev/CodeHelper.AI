@@ -2,5 +2,5 @@
 
 public interface ICodeHelperAgent
 {
-    IAsyncEnumerable<string> RunAsync(string input);
+    IAsyncEnumerable<string> RunAsync(string input, CancellationToken ct);
 }

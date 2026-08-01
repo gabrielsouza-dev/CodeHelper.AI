@@ -1,7 +1,6 @@
 ﻿using CodeHelper.Core.Interfaces;
 using CodeHelper.Core.Models;
-using Microsoft.Extensions.AI.Evaluation;
-using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace CodeHelper.Core;
 
@@ -16,27 +15,30 @@ public class CodeHelper : ICodeHelper
         _routerAgent = routerAgent;
     }
 
-    public async IAsyncEnumerable<string> RunAsync(string input)
+    public async IAsyncEnumerable<string> RunAsync(string input, CancellationToken ct)
     {
-        var route = await GetRouteAsync(input);
+        var route = await GetRouteAsync(input, ct);
         
         if(route.NeedWebSearch)
         {
             //logica de pesquisa
         }
 
-        await foreach (var chunk in RunAssistentAsync(input))
+        await foreach (var chunk in _codeHelperAgent.RunAsync(input, ct))
         {
             yield return chunk;
         }
     }
 
-    private async Task<AgentRouterResponse> GetRouteAsync(string input)
+    private async Task<AgentRouterResponse> GetRouteAsync(string input, CancellationToken ct)
     {
         AgentRouterResponse? route = null;
         for (int i = 0; i < 3; i++)
         {
-            route = await _routerAgent.RunAsync(input);
+            if(ct.IsCancellationRequested)
+               throw new OperationCanceledException(); 
+
+            route = await _routerAgent.RunAsync(input, ct);
 
             if (route != null) break;
         }
@@ -44,14 +46,6 @@ public class CodeHelper : ICodeHelper
             throw new GetRouterException("Falha ao verificar rotas necessarias em 3 tentativas.");
 
         return route;
-    }
-
-    private async IAsyncEnumerable<string> RunAssistentAsync(string input)
-    {
-        await foreach (var chunk in _codeHelperAgent.RunAsync(input))
-        {
-            yield return chunk;
-        }
     }
 }
 

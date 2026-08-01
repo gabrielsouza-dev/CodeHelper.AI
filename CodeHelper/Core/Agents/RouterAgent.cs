@@ -21,7 +21,7 @@ public class RouterAgent : IRouterAgent
         };
     }
 
-    public async Task<AgentRouterResponse?> RunAsync(string input)
+    public async Task<AgentRouterResponse?> RunAsync(string input, CancellationToken ct)
     {
         var session = await Agent.CreateSessionAsync();
 
@@ -30,7 +30,7 @@ public class RouterAgent : IRouterAgent
 
         session.SetInMemoryChatHistory(messages);
 
-        var response = await Agent.RunAsync(session, _agentOptions);
+        var response = await Agent.RunAsync(session, _agentOptions, ct);
         var objectResponse = JsonSerializer.Deserialize<AgentRouterResponse>(response.Text) ?? null;
 
         return objectResponse;

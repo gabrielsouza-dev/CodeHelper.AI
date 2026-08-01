@@ -20,7 +20,7 @@ public class CodeHelperAgent : ICodeHelperAgent
         };
     }
 
-    public async IAsyncEnumerable<string> RunAsync(string input)
+    public async IAsyncEnumerable<string> RunAsync(string input, CancellationToken ct)
     {
         var session = await Agent.CreateSessionAsync();
 
@@ -29,7 +29,7 @@ public class CodeHelperAgent : ICodeHelperAgent
 
         session.SetInMemoryChatHistory(messages);
 
-        await foreach (var update in Agent.RunStreamingAsync(session, _agentOptions))
+        await foreach (var update in Agent.RunStreamingAsync(session, _agentOptions, ct))
         {
             yield return update.Text;
         }
