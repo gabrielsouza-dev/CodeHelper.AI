@@ -25,15 +25,15 @@ builder.Configuration
     .AddEnvironmentVariables()
     .AddCommandLine(args, new Dictionary<string, string>
     {
-        ["--api-key"] = "CodeHelperSettings:ApiKey",
-        ["--api-url"] = "CodeHelperSettings:ApiUrl",
-        ["--agent-model"] = "CodeHelperSettings:AgentModel",
-        ["--router-model"] = "CodeHelperSettings:RouterModel",
-        ["--language"] = "CodeHelperSettings:ProgrammingLanguage"
+        ["--api-key"] = "CodeHelper:ApiKey",
+        ["--api-url"] = "CodeHelper:ApiUrl",
+        ["--agent-model"] = "CodeHelper:AgentModel",
+        ["--router-model"] = "CodeHelper:RouterModel",
+        ["--language"] = "CodeHelper:ProgrammingLanguage"
     });
 
 builder.Services.Configure<CodeHelperSettings>(
-    builder.Configuration.GetSection("CodeHelperSettings"));
+    builder.Configuration.GetSection("CodeHelper"));
 
 builder.Services.AddSingleton<ICodeHelper>((services) =>
 {
