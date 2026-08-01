@@ -21,8 +21,16 @@ builder.Configuration.Sources.Clear();
 
 builder.Configuration
     .SetBasePath(basePath)
-    .AddJsonFile("appsettings.json", optional: false)
-    .AddEnvironmentVariables();
+    .AddJsonFile("appsettings.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddCommandLine(args, new Dictionary<string, string>
+    {
+        ["--api-key"] = "CodeHelperSettings:ApiKey",
+        ["--api-url"] = "CodeHelperSettings:ApiUrl",
+        ["--agent-model"] = "CodeHelperSettings:AgentModel",
+        ["--router-model"] = "CodeHelperSettings:RouterModel",
+        ["--language"] = "CodeHelperSettings:ProgrammingLanguage"
+    });
 
 builder.Services.Configure<CodeHelperSettings>(
     builder.Configuration.GetSection("CodeHelperSettings"));
