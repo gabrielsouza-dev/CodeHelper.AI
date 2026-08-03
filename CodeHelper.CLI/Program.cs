@@ -43,13 +43,14 @@ builder.Services.Configure<WebSearchMCPOptions>(
 
 builder.Services.AddSingleton<WebSearchMCP>();
 
-//builder.Services.AddHostedService<WebSearchMCPStartupService>();
 var webSearchMCP = builder.Services.BuildServiceProvider().GetRequiredService<WebSearchMCP>();
 await webSearchMCP.StartWebSearchMCP();
 
 builder.Services.AddSingleton<ICodeHelper>((services) =>
 {
     var settings = services.GetRequiredService<IOptions<CodeHelperOptions>>().Value;
+
+    WriterHelper.PrintSettings(settings).GetAwaiter().GetResult();
 
     var codeHelper = CodeHelperFactory
         .ConfigureClient(settings.ApiKey, settings.ApiUrl)
