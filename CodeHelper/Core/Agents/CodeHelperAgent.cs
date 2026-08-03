@@ -2,6 +2,7 @@
 using CodeHelper.Core.Models;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
+using System.Runtime.CompilerServices;
 
 namespace CodeHelper.Core.Agents;
 
@@ -20,7 +21,7 @@ public class CodeHelperAgent : ICodeHelperAgent
         };
     }
 
-    public async IAsyncEnumerable<string> RunAsync(string input, CancellationToken ct)
+    public async IAsyncEnumerable<string> RunAsync(string input, [EnumeratorCancellation] CancellationToken ct)
     {
         var session = await Agent.CreateSessionAsync();
 

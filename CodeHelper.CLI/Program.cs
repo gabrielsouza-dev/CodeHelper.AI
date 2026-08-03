@@ -1,5 +1,7 @@
 ﻿using CodeHelper.Core;
 using CodeHelper.Core.Interfaces;
+using CodeHelper.Core.Options;
+using CodeHelper.Core.Tools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,17 +34,26 @@ builder.Configuration
         ["--language"] = "CodeHelper:ProgrammingLanguage"
     });
 
-builder.Services.Configure<CodeHelperSettings>(
+builder.Services.Configure<CodeHelperOptions>(
     builder.Configuration.GetSection("CodeHelper"));
+
+builder.Services.Configure<WebSearchMCPOptions>(
+    builder.Configuration.GetSection("WebSearchMCP"));
+
+builder.Services.AddSingleton<WebSearchMCP>();
+
+builder.Services.AddHostedService<WebSearchMCPStartupService>();
 
 builder.Services.AddSingleton<ICodeHelper>((services) =>
 {
-    var settings = services.GetRequiredService<IOptions<CodeHelperSettings>>().Value;
+    var settings = services.GetRequiredService<IOptions<CodeHelperOptions>>().Value;
+    var webSearchMCP = services.GetRequiredService<WebSearchMCP>();
 
     var codeHelper = CodeHelperFactory
         .ConfigureClient(settings.ApiKey, settings.ApiUrl)
         .SelectPrincipalModel(settings.AgentModel)
         .SelectRouterModel(settings.RouterModel)
+        .WithTools(webSearchMCP.Tools)
         .WithLanguage(settings.ProgrammingLanguage)
         .Build();
 

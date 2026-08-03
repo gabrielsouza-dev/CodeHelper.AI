@@ -15,7 +15,7 @@ public class CodeHelper : ICodeHelper
         _routerAgent = routerAgent;
     }
 
-    public async IAsyncEnumerable<string> RunAsync(string input, CancellationToken ct)
+    public async IAsyncEnumerable<string> RunAsync(string input, [EnumeratorCancellation] CancellationToken ct)
     {
         var route = await GetRouteAsync(input, ct);
         

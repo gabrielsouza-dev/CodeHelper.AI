@@ -27,6 +27,12 @@ public static class CodeHelperFactory
         options.RouterModel = model;
         return options;
     }
+    public static AgentOptions WithTools(this AgentOptions options, IList<AITool> tools)
+    {
+        options.WebSearchTools = tools;
+        return options;
+    }
+
 
     public static CodeHelper Build(this AgentOptions options)
     {

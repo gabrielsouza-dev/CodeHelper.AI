@@ -1,4 +1,6 @@
-﻿namespace CodeHelper.Core.Options;
+﻿using Microsoft.Extensions.AI;
+
+namespace CodeHelper.Core.Options;
 
 public class AgentOptions
 {
@@ -7,6 +9,8 @@ public class AgentOptions
     public string AgentModel { get; set; } = "openai/gpt-4.1-mini";
     public string RouterModel { get; set; } = "openai/gpt-4.1-nano";
     public string ProgrammingLanguage { get; set; } = "C#";
+    public IList<AITool> WebSearchTools { get; set; } = new List<AITool>();
+
     public AgentOptions(string apiKey, string? apiUrl = null)
     {
         ApiKey = apiKey;
