@@ -145,7 +145,7 @@ public sealed class JsonFieldStreamer
                 if (!_readingArrayItem)
                 {
                     BeginWrite();
-                    Console.Write("• ");
+                    Console.Write("- ");
                     _readingArrayItem = true;
                 }
                 else
