@@ -1,5 +1,5 @@
 ﻿using CodeHelper.Core.Interfaces;
-using CodeHelper.Core.Models;
+using CodeHelper.Models;
 using JsonStreamingParser;
 using Microsoft.Extensions.Hosting;
 
@@ -20,6 +20,7 @@ public class ConsoleWorker : BackgroundService
 
         do
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.Write("Input: ");
             var input = Console.ReadLine();
 
