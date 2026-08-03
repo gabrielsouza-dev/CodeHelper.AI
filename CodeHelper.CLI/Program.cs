@@ -1,4 +1,5 @@
-﻿using CodeHelper.Core;
+﻿using CodeHelper.CLI.Helpers;
+using CodeHelper.Core;
 using CodeHelper.Core.Interfaces;
 using CodeHelper.Core.Tools;
 using CodeHelper.Options;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+ConsoleHelper.DisableQuickEdit();
 
 var basePath =
 #if DEBUG

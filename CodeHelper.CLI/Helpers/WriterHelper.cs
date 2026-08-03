@@ -1,5 +1,6 @@
 ﻿using CodeHelper.Options;
 
+namespace CodeHelper.CLI.Helpers;
 public static class WriterHelper
 {
     public static void Header()
