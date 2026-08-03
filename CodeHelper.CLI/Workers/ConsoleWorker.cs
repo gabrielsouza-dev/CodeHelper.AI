@@ -1,4 +1,5 @@
-﻿using CodeHelper.Core.Interfaces;
+﻿using CodeHelper.CLI.Helpers;
+using CodeHelper.Core.Interfaces;
 using CodeHelper.Models;
 using JsonStreamingParser;
 using Microsoft.Extensions.Hosting;
