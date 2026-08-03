@@ -1,4 +1,4 @@
-﻿namespace CodeHelper.Core.Options;
+﻿namespace CodeHelper.Options;
 
 public class WebSearchMCPOptions
 {

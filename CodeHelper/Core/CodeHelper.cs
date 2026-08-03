@@ -1,5 +1,7 @@
-﻿using CodeHelper.Core.Interfaces;
-using CodeHelper.Core.Models;
+﻿using CodeHelper.Core.Agents;
+using CodeHelper.Core.Interfaces;
+using CodeHelper.Exceptions;
+using CodeHelper.Models;
 using System.Runtime.CompilerServices;
 
 namespace CodeHelper.Core;
@@ -8,23 +10,33 @@ public class CodeHelper : ICodeHelper
 {
     private readonly ICodeHelperAgent _codeHelperAgent;
     private readonly IRouterAgent _routerAgent;
+    private readonly IWebSearchAgent _webSearchAgent;
 
-    public CodeHelper(ICodeHelperAgent assistantAgent, IRouterAgent routerAgent)
+    public CodeHelper(ICodeHelperAgent assistantAgent, IRouterAgent routerAgent, IWebSearchAgent webSearchAgent)
     {
         _codeHelperAgent = assistantAgent;
         _routerAgent = routerAgent;
+        _webSearchAgent = webSearchAgent;
     }
 
     public async IAsyncEnumerable<string> RunAsync(string input, [EnumeratorCancellation] CancellationToken ct)
     {
-        var route = await GetRouteAsync(input, ct);
-        
-        if(route.NeedWebSearch)
+        string? webSearchResponse = null;
+        if(_routerAgent is RouterAgent)
         {
-            //logica de pesquisa
+            Console.Write("[Router] Necessita Pesquisa Web?");
+            var route = await GetRouteAsync(input, ct);
+            var routerWebSearchResponse = route.NeedWebSearch ? "Sim" : "Não";
+            Console.WriteLine(" - " + routerWebSearchResponse);
+
+            if (route.NeedWebSearch)
+            {
+                Console.WriteLine("[WebSearch] Rodando Pesquisa Web...");
+                webSearchResponse = await _webSearchAgent.RunAsync(input, ct);
+            }
         }
 
-        await foreach (var chunk in _codeHelperAgent.RunAsync(input, ct))
+        await foreach (var chunk in _codeHelperAgent.RunAsync(input, webSearchResponse, ct))
         {
             yield return chunk;
         }
@@ -47,9 +59,4 @@ public class CodeHelper : ICodeHelper
 
         return route;
     }
-}
-
-public class GetRouterException : Exception 
-{
-    public GetRouterException(string message) : base(message: message) { }
 }

@@ -1,5 +1,6 @@
 ﻿using CodeHelper.Core.Agents;
-using CodeHelper.Core.Options;
+using CodeHelper.Core.Interfaces;
+using CodeHelper.Options;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using System.ClientModel;
@@ -8,36 +9,49 @@ namespace CodeHelper.Core;
 
 public static class CodeHelperFactory
 {
-    public static AgentOptions ConfigureClient(string apiKey, string? apiUrl = null) => new(apiKey, apiUrl);
+    public static CodeHelperOptions ConfigureClient(string apiKey, string? apiUrl = null)
+    {
+        return new CodeHelperOptions
+        {
+            ApiKey = apiKey,
+            ApiUrl = apiUrl ?? "https://api.openai.com/v1"
+        };
+    }
 
-    public static AgentOptions WithLanguage(this AgentOptions options, string language)
+    public static CodeHelperOptions WithLanguage(this CodeHelperOptions options, string language)
     {
         options.ProgrammingLanguage = language;
         return options;
     }
 
-    public static AgentOptions SelectPrincipalModel(this AgentOptions options, string model)
+    public static CodeHelperOptions SelectPrincipalModel(this CodeHelperOptions options, string model)
     {
         options.AgentModel = model;
         return options;
     }
 
-    public static AgentOptions SelectRouterModel(this AgentOptions options, string model)
+    public static CodeHelperOptions SelectRouterModel(this CodeHelperOptions options, string? model)
     {
         options.RouterModel = model;
         return options;
     }
-    public static AgentOptions WithTools(this AgentOptions options, IList<AITool> tools)
+
+    public static CodeHelperOptions SelectWebSearchModel(this CodeHelperOptions options, string? webSearchModel)
+    {
+        options.WebSearchModel = webSearchModel;
+        return options;
+    }
+
+    public static CodeHelperOptions WithTools(this CodeHelperOptions options, IList<AITool>? tools)
     {
         options.WebSearchTools = tools;
         return options;
     }
 
 
-    public static CodeHelper Build(this AgentOptions options)
+    public static ICodeHelper Build(this CodeHelperOptions options)
     {
-        var codehelperInstrictions = GetCodeHelperInstruction(options.ProgrammingLanguage, "CodeHelper");
-        var RouterInstrictions = GetCodeHelperInstruction(options.ProgrammingLanguage, "RouterAgent");
+        var codehelperInstrictions = GetAgentInstructions("CodeHelper", options.ProgrammingLanguage);
 
         var openAiClient = new OpenAIClient(
             new ApiKeyCredential(options.ApiKey),
@@ -46,24 +60,53 @@ public static class CodeHelperFactory
                 Endpoint = new Uri(options.ApiUrl)
             });
 
-        IChatClient chatClient = openAiClient
+        IChatClient principalClient = openAiClient
             .GetChatClient(options.AgentModel)
             .AsIChatClient();
 
-        var codeHelperChat = chatClient.AsAIAgent(instructions: codehelperInstrictions, name: "CodeHelper");
+        var codeHelperChat = principalClient.AsAIAgent(instructions: codehelperInstrictions, name: "CodeHelper");
+
         var codeHelper = new CodeHelperAgent(codeHelperChat);
 
-        var routerChat = chatClient.AsAIAgent(instructions: RouterInstrictions, name: "RouterAgent");
-        var routerAgent = new RouterAgent(routerChat);
+        IRouterAgent? routerAgent = null;
+        IWebSearchAgent? webSearchAgent = null;
+        if (options.RouterModel is null
+            || options.WebSearchModel is null
+            || options.WebSearchTools is null
+            || options.WebSearchTools?.Count == 0)
+        {
+            routerAgent = new NoOpRouterAgent();
+            webSearchAgent = new NoOpWebSearchAgent();
+        } else
+        {
+            var RouterInstructions = GetAgentInstructions("RouterAgent");
+            var WebSearchInstructions = GetAgentInstructions("WebSearchAgent");
 
-        return new(codeHelper, routerAgent);
+            IChatClient routerClient = openAiClient
+            .GetChatClient(options.RouterModel)
+            .AsIChatClient();
+
+            IChatClient webSearchClient = openAiClient
+                .GetChatClient(options.WebSearchModel)
+                .AsIChatClient();
+
+            var routerChat = routerClient.AsAIAgent(instructions: RouterInstructions, name: "RouterAgent");
+            var webSearchChat = webSearchClient.AsAIAgent(instructions: WebSearchInstructions, name: "WebSearchAgent", tools: options.WebSearchTools);
+
+            routerAgent = new RouterAgent(routerChat);
+            webSearchAgent = new WebSearchAgent(webSearchChat);
+        }
+
+        return new CodeHelper(codeHelper, routerAgent, webSearchAgent);
     }
 
-    private static string GetCodeHelperInstruction(string programmingLanguage, string InstructionName)
+    private static string GetAgentInstructions(string InstructionName, string? programmingLanguage = null)
     {
         var instructionsPath = Path.Combine(AppContext.BaseDirectory, "Instructions", $"{InstructionName}.md");
         var instruction = File.ReadAllText(instructionsPath);
-        instruction = string.Format(instruction, programmingLanguage);
+
+        if (programmingLanguage != null)
+            instruction = string.Format(instruction, programmingLanguage);
 
         return instruction;
     }

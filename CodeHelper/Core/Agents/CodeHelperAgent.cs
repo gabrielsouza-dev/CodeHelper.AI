@@ -1,5 +1,5 @@
 ﻿using CodeHelper.Core.Interfaces;
-using CodeHelper.Core.Models;
+using CodeHelper.Models;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using System.Runtime.CompilerServices;
@@ -8,12 +8,12 @@ namespace CodeHelper.Core.Agents;
 
 public class CodeHelperAgent : ICodeHelperAgent
 {
-    public ChatClientAgent Agent { get; set; }
+    private ChatClientAgent _agent { get; set; }
     private readonly ChatClientAgentRunOptions _agentOptions;
     
     public CodeHelperAgent(ChatClientAgent agent)
     {
-        Agent = agent;
+        _agent = agent;
 
         _agentOptions = new ChatClientAgentRunOptions()
         {
@@ -21,16 +21,16 @@ public class CodeHelperAgent : ICodeHelperAgent
         };
     }
 
-    public async IAsyncEnumerable<string> RunAsync(string input, [EnumeratorCancellation] CancellationToken ct)
+    public async IAsyncEnumerable<string> RunAsync(string input, string? webSearchResponse, [EnumeratorCancellation] CancellationToken ct)
     {
-        var session = await Agent.CreateSessionAsync();
+        var session = await _agent.CreateSessionAsync();
 
         var messages = new List<ChatMessage>();
         messages.Add(new(ChatRole.User, input));
 
         session.SetInMemoryChatHistory(messages);
 
-        await foreach (var update in Agent.RunStreamingAsync(session, _agentOptions, ct))
+        await foreach (var update in _agent.RunStreamingAsync(session, _agentOptions, ct))
         {
             yield return update.Text;
         }

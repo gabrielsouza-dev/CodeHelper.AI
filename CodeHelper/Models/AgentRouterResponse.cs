@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace CodeHelper.Core.Models;
+namespace CodeHelper.Models;
 
 public class AgentRouterResponse
 {

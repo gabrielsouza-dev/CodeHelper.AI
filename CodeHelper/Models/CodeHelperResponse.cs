@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace CodeHelper.Core.Models;
+namespace CodeHelper.Models;
 public class CodeHelperResponse
 {
     [Description("Título curto que resume a solução.")]

@@ -1,4 +1,4 @@
-﻿using CodeHelper.Core.Models;
+﻿using CodeHelper.Models;
 
 namespace CodeHelper.Core.Interfaces;
 

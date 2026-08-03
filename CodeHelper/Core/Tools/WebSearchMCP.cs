@@ -1,26 +1,35 @@
-﻿using CodeHelper.Core.Options;
+﻿using CodeHelper.Options;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Options;
 using ModelContextProtocol.Client;
 
+namespace CodeHelper.Core.Tools;
 public class WebSearchMCP : IAsyncDisposable
 {
+    private readonly WebSearchMCPOptions _mcpOptions;
+
+    public WebSearchMCP(IOptions<WebSearchMCPOptions> mcpOptions)
+    {
+        _mcpOptions = mcpOptions.Value;
+    }
+
     private McpClient? _client;
     public readonly List<AITool> Tools = new List<AITool>();
 
-    public async Task StartWebSearchMCP(WebSearchMCPOptions mcpOptions)
+    public async Task StartWebSearchMCP()
     {
         Console.Write("Iniciando Web Search MCP... ");
 
         var args = new List<string> { "run", "-i", "--rm" };
-        args.AddRange(["--name", mcpOptions.Name]);
-        args.AddRange(["-e", $"{mcpOptions.EnvApiName}={mcpOptions.ApiKey}"]);
-        args.Add(mcpOptions.Id);
+        args.AddRange(["--name", _mcpOptions.Name]);
+        args.AddRange(["-e", $"{_mcpOptions.EnvApiName}={_mcpOptions.ApiKey}"]);
+        args.Add(_mcpOptions.Id);
 
         var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
         {
             Command = "docker",
             Arguments = [.. args],
-            Name = mcpOptions.Name
+            Name = _mcpOptions.Name
         });
 
         var mcpClient = await McpClient.CreateAsync(clientTransport);
