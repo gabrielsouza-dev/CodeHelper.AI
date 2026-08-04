@@ -22,7 +22,7 @@ public class WebSearchMCP
 
         var args = new List<string> { "run", "-i", "--rm" };
         args.AddRange(["--name", _mcpOptions.Name]);
-        args.AddRange(["-e", $"{_mcpOptions.EnvApiName}={_mcpOptions.ApiKey}"]);
+        args.AddRange(_mcpOptions.Args.Split(" "));
         args.Add(_mcpOptions.Id);
 
         var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
