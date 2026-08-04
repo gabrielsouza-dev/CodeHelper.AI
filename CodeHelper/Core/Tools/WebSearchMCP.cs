@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using ModelContextProtocol.Client;
 
 namespace CodeHelper.Core.Tools;
-public class WebSearchMCP : IAsyncDisposable
+public class WebSearchMCP
 {
     private readonly WebSearchMCPOptions _mcpOptions;
 
@@ -41,24 +41,5 @@ public class WebSearchMCP : IAsyncDisposable
 
         Console.WriteLine(" - OK");
         await Task.Delay(1000);
-    }
-
-    public async Task StopMcpsAsync()
-    {
-        if (_client is not null)
-        {
-            Console.Write($"Parando Web Search MCP...");
-            await _client.DisposeAsync(); 
-            Console.WriteLine(" - OK");
-            await Task.Delay(1000);
-        }
-
-        _client = null;
-        Tools.Clear();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await StopMcpsAsync();
     }
 }
