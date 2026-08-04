@@ -10,12 +10,14 @@ public sealed class JsonFieldStreamer
         SearchingValue,
         ReadingString,
         ReadingArray,
+        ReadingUnicodeEscape,
         Completed
     }
 
     private readonly string _propertyPattern;
     private readonly ConsoleColor _consoleColor;
     private readonly StringBuilder _searchBuffer = new();
+    private readonly StringBuilder _unicodeBuffer = new(4);
 
     private State _state = State.SearchingProperty;
 
@@ -58,8 +60,9 @@ public sealed class JsonFieldStreamer
                     HandleReadingArray(c);
                     break;
 
-                case State.Completed:
-                    return;
+                case State.ReadingUnicodeEscape:
+                    HandleUnicodeEscape(c);
+                    break;
             }
         }
     }
@@ -83,16 +86,12 @@ public sealed class JsonFieldStreamer
         if (char.IsWhiteSpace(c) || c == ':')
             return;
 
-        switch (c)
+        _state = c switch
         {
-            case '"':
-                _state = State.ReadingString;
-                break;
-
-            case '[':
-                _state = State.ReadingArray;
-                break;
-        }
+            '"' => State.ReadingString,
+            '[' => State.ReadingArray,
+            _ => _state
+        };
     }
 
     private void HandleReadingString(char c)
@@ -101,8 +100,7 @@ public sealed class JsonFieldStreamer
 
         if (_escape)
         {
-            Console.Write(Unescape(c));
-            _escape = false;
+            HandleEscape(c);
             return;
         }
 
@@ -110,17 +108,15 @@ public sealed class JsonFieldStreamer
         {
             case '\\':
                 _escape = true;
-                return;
+                break;
 
             case '"':
-                EndWrite();
-                _state = State.Completed;
-                Console.WriteLine();
-                return;
+                Complete();
+                break;
 
             default:
                 Console.Write(c);
-                return;
+                break;
         }
     }
 
@@ -128,18 +124,19 @@ public sealed class JsonFieldStreamer
     {
         if (_escape)
         {
-            Console.Write(Unescape(c));
-            _escape = false;
+            HandleEscape(c);
             return;
         }
 
         switch (c)
         {
+            case '\\':
+                _escape = true;
+                break;
+
             case ']':
-                EndWrite();
-                _state = State.Completed;
-                Console.WriteLine();
-                return;
+                Complete();
+                break;
 
             case '"':
                 if (!_readingArrayItem)
@@ -153,17 +150,54 @@ public sealed class JsonFieldStreamer
                     _readingArrayItem = false;
                     Console.WriteLine();
                 }
-                return;
-
-            case '\\':
-                _escape = true;
-                return;
+                break;
 
             default:
                 if (_readingArrayItem)
                     Console.Write(c);
-                return;
+                break;
         }
+    }
+
+    private void HandleEscape(char c)
+    {
+        _escape = false;
+
+        if (c == 'u')
+        {
+            _unicodeBuffer.Clear();
+            _state = State.ReadingUnicodeEscape;
+            return;
+        }
+
+        Console.Write(Unescape(c));
+    }
+
+    private void HandleUnicodeEscape(char c)
+    {
+        _unicodeBuffer.Append(c);
+
+        if (_unicodeBuffer.Length < 4)
+            return;
+
+        if (ushort.TryParse(
+            _unicodeBuffer.ToString(),
+            System.Globalization.NumberStyles.HexNumber,
+            null,
+            out var value))
+        {
+            Console.Write((char)value);
+        }
+
+        _unicodeBuffer.Clear();
+        _state = State.ReadingString;
+    }
+
+    private void Complete()
+    {
+        EndWrite();
+        _state = State.Completed;
+        Console.WriteLine();
     }
 
     private void BeginWrite()
@@ -187,6 +221,8 @@ public sealed class JsonFieldStreamer
 
     private static char Unescape(char c) => c switch
     {
+        'b' => '\b',
+        'f' => '\f',
         'n' => '\n',
         'r' => '\r',
         't' => '\t',
