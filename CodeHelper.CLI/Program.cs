@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-ConsoleHelper.DisableQuickEdit();
+ConsoleHelper.Initialize();
 
 var basePath =
 #if DEBUG
@@ -69,5 +69,6 @@ builder.Services.AddSingleton<ICodeHelper>((services) =>
 
 builder.Services.AddHostedService<ConsoleWorker>();
 
+ConsoleHelper.EnableQuickEdit();
 var app = builder.Build();
 await app.RunAsync();
