@@ -1,103 +1,88 @@
+# Firecrawl — Pesquisa Técnica
+
+## Objetivo
+
+Use Firecrawl apenas para buscar informações técnicas atualizadas:
+- documentação oficial;
+- APIs e frameworks;
+- GitHub Issues;
+- Stack Overflow.
+
+Não use para pesquisas gerais.
+
+## Regra principal
+
+Antes de usar Firecrawl:
+
+1. Tente responder com conhecimento próprio.
+2. Use Firecrawl somente quando precisar:
+   - confirmar uma API ou versão;
+   - consultar documentação atualizada;
+   - investigar um erro específico;
+   - encontrar uma solução existente.
+
+Evite chamadas desnecessárias.
+
+## Fluxo
+
+### Tenho URL confiável
+
+Use scrape:
+
+firecrawl scrape "URL" -o .firecrawl/result.md
+
+Exemplos:
+- documentação oficial;
+- issue específica;
+- página conhecida.
+
 ---
-name: firecrawl-dev-docs
-description: |
-  Skill enxuta do Firecrawl para um agente de programação. Usada para
-  consultar documentação de APIs e frameworks, e buscar discussões
-  técnicas em fóruns (Stack Overflow, GitHub Issues, etc). Não cobre
-  integração de produto, workflows de entregável ou fluxos de auth —
-  apenas o essencial para pesquisa técnica ao vivo.
+
+### Não tenho URL
+
+Use search com uma consulta específica:
+
+firecrawl search "erro ou tecnologia específica" -o .firecrawl/search.md
+
+Prioridade:
+1. documentação oficial;
+2. GitHub oficial;
+3. Stack Overflow.
+
+Depois do search, faça scrape apenas da melhor fonte.
+
 ---
 
-# Firecrawl — Pesquisa Técnica (Docs & Fórum)
+### Página precisa interação
 
-Este agente usa o Firecrawl só para uma coisa: **buscar e ler
-informação técnica na web** (documentação oficial de API/framework,
-threads de fórum, issues de GitHub) durante a própria sessão.
+Use interact somente se:
+- precisa trocar versão;
+- conteúdo está escondido;
+- depende de cliques.
 
-## Instalação (uma vez)
+## Performance
 
-```bash
-npx -y firecrawl-cli@latest init --all --browser
-```
+- Não use Firecrawl se a resposta já for conhecida.
+- Não faça múltiplas buscas para a mesma pergunta.
+- Prefira uma fonte boa a várias fontes.
+- Não use crawl, map ou monitor.
+- Sempre salve resultados em `.firecrawl/`.
+- Sempre mantenha a URL original da fonte.
 
-Verifique se está funcionando:
+## Falhas
 
-```bash
-firecrawl --status
-```
+Se falhar:
+- tente novamente uma vez;
+- use ask com jobId se disponível.
 
-Se não houver `FIRECRAWL_API_KEY` configurada, o comando acima já abre
-o login no navegador. Sem chave, ainda dá pra usar o tier gratuito sem
-login (mais lento, com limite de requisições) — não precisa fazer nada
-extra, os comandos abaixo funcionam do mesmo jeito.
+firecrawl ask --job-id <id>
 
-## Fluxo de decisão
+## Fora de escopo
 
-Use sempre nesta ordem:
-
-1. **Não sei a URL exata (nome de uma lib, um erro, um conceito)**
-   → `firecrawl search`
-2. **Já tenho a URL** (ex: doc oficial de um endpoint, uma issue
-   específica do GitHub, uma página do Stack Overflow)
-   → `firecrawl scrape`
-3. **A página exige interação** (precisa clicar em "expandir", trocar
-   de aba de versão, passar por um seletor de linguagem)
-   → `firecrawl interact`
-4. **É um arquivo local** (PDF/DOCX de uma spec baixada)
-   → `firecrawl parse`
-5. **Uma chamada falhou ou voltou algo estranho**
-   → `firecrawl ask` passando o `jobId` que falhou
-
-Não use `monitor`, `crawl`, `map` nem os fluxos de workflow/deliverable
-— não fazem parte do escopo desse agente.
-
-## Comandos
-
-**Buscar (ponto de partida padrão):**
-```bash
-firecrawl search "nome da lib erro específico" -o .firecrawl/busca.md
-```
-
-**Scrape de uma página conhecida:**
-```bash
-firecrawl scrape "https://docs.exemplo.com/api/endpoint" -o .firecrawl/doc.md
-```
-
-**Página com interação (ex: seletor de versão):**
-```bash
-firecrawl interact "https://docs.exemplo.com/api" \
-  --action "click:#version-selector" \
-  -o .firecrawl/doc-interativo.md
-```
-
-**Documento local:**
-```bash
-firecrawl parse ./especificacao.pdf -o .firecrawl/spec.md
-```
-
-**Debug de falha:**
-```bash
-firecrawl ask --job-id <id-que-falhou>
-```
-
-## Regras práticas
-
-- Sempre salvar o resultado em `.firecrawl/` com `-o`, pra manter
-  rastro do que foi consultado na sessão.
-- Preferir `search` quando não tiver certeza da URL — economiza
-  tentativa e erro.
-- Ao citar uma doc para o usuário, sempre linkar a URL de origem
-  (não só resumir sem fonte).
-- Se a mesma página precisar ser checada várias vezes ao longo do
-  tempo (ex: acompanhar changelog de uma lib), isso foge do escopo
-  desta skill — nesse caso avise que existe `firecrawl monitor`, mas
-  não implemente aqui.
-
-## Fora de escopo (não usar)
-
-- Integração de Firecrawl em código de produto (SDK, chamadas de API
-  dentro do app do usuário)
-- Geração de entregáveis (relatórios de SEO, lead lists, clones de
-  design)
-- Fluxo completo de autenticação/CLI OAuth — só rode o install acima
-  uma vez; se pedir login, é o próprio comando que cuida disso
+Não usar:
+- crawl;
+- map;
+- monitor;
+- workflows;
+- geração de relatórios;
+- integração Firecrawl em aplicações.
