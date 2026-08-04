@@ -25,6 +25,9 @@ public class CodeHelperAgent : ICodeHelperAgent
     {
         var session = await _agent.CreateSessionAsync();
 
+        if (!string.IsNullOrEmpty(webSearchResponse))
+            input += "\n" + webSearchResponse;
+
         var messages = new List<ChatMessage>();
         messages.Add(new(ChatRole.User, input));
 
