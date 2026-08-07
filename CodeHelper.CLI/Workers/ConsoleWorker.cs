@@ -31,12 +31,14 @@ public class ConsoleWorker : BackgroundService
             Console.WriteLine();
             try
             {
+                var state = new JsonFieldStreamer(nameof(CodeHelperState.ExecutionState), ConsoleColor.Yellow);
                 var title = new JsonFieldStreamer(nameof(CodeHelperResponse.Title), ConsoleColor.Green);
                 var explanation = new JsonFieldStreamer(nameof(CodeHelperResponse.Explanation), ConsoleColor.Cyan);
                 var code = new JsonFieldStreamer(nameof(CodeHelperResponse.Code), ConsoleColor.Gray);
                 var notes = new JsonFieldStreamer(nameof(CodeHelperResponse.Notes), ConsoleColor.Yellow);
                 await foreach (var chunk in _codeHelper.RunAsync(input!, ct))
                 {
+                    state.ProcessChunk(chunk);
                     title.ProcessChunk(chunk);
                     code.ProcessChunk(chunk);
                     explanation.ProcessChunk(chunk);

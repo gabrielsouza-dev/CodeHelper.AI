@@ -24,14 +24,15 @@ public class CodeHelper : ICodeHelper
         string? webSearchResponse = null;
         if(_routerAgent is RouterAgent)
         {
-            Console.Write("[Router] Necessita Pesquisa Web?");
+
+            yield return EmitStartExecutionState("[Router] Necessita Pesquisa Web?");
             var route = await GetRouteAsync(input, ct);
             var routerWebSearchResponse = route.NeedWebSearch ? "Sim" : "Não";
-            Console.WriteLine(" - " + routerWebSearchResponse);
+            yield return EmitEndExecutionState(" - " + routerWebSearchResponse);
 
             if (route.NeedWebSearch)
             {
-                Console.WriteLine("[WebSearch] Rodando Pesquisa Web...");
+                yield return EmitCompletedExecutionState("[WebSearch] Rodando Pesquisa Web...");
                 webSearchResponse = await _webSearchAgent.RunAsync(input, ct);
             }
         }
@@ -59,4 +60,13 @@ public class CodeHelper : ICodeHelper
 
         return route;
     }
+
+    private string EmitCompletedExecutionState(string message) =>
+        $"{{ \"executionstate\": \"{message}\" }}";
+
+    private string EmitStartExecutionState(string message) =>
+        $"{{ \"executionstate\": \"{message}";
+
+    private string EmitEndExecutionState(string? message) =>
+        $" {message ?? ""}\" }}";
 }
