@@ -8,9 +8,9 @@ public class WebSearchMCP
 {
     private readonly WebSearchMCPOptions _mcpOptions;
 
-    public WebSearchMCP(IOptions<WebSearchMCPOptions> mcpOptions)
+    public WebSearchMCP(WebSearchMCPOptions mcpOptions)
     {
-        _mcpOptions = mcpOptions.Value;
+        _mcpOptions = mcpOptions;
     }
 
     private McpClient? _client;

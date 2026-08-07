@@ -1,12 +1,12 @@
-﻿using CodeHelper.Core.Agents;
+﻿using CodeHelper.Core;
+using CodeHelper.Core.Agents;
 using CodeHelper.Core.Interfaces;
 using CodeHelper.Options;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using System.ClientModel;
 
-namespace CodeHelper.Core;
-
+namespace CodeHelper.Extensions;
 public static class CodeHelperFactory
 {
     public static CodeHelperOptions ConfigureClient(string apiKey, string? apiUrl = null)
@@ -49,7 +49,7 @@ public static class CodeHelperFactory
     }
 
 
-    public static ICodeHelper Build(this CodeHelperOptions options)
+    public static ICodeHelperEngine Build(this CodeHelperOptions options)
     {
         var codehelperInstrictions = GetAgentInstructions("CodeHelper", options.ProgrammingLanguage);
 
@@ -97,7 +97,7 @@ public static class CodeHelperFactory
             webSearchAgent = new WebSearchAgent(webSearchChat);
         }
 
-        return new CodeHelper(codeHelper, routerAgent, webSearchAgent);
+        return new CodeHelperEngine(codeHelper, routerAgent, webSearchAgent);
     }
 
     private static string GetAgentInstructions(string InstructionName, string? programmingLanguage = null)

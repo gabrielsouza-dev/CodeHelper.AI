@@ -6,13 +6,13 @@ using System.Runtime.CompilerServices;
 
 namespace CodeHelper.Core;
 
-public class CodeHelper : ICodeHelper
+public class CodeHelperEngine : ICodeHelperEngine
 {
     private readonly ICodeHelperAgent _codeHelperAgent;
     private readonly IRouterAgent _routerAgent;
     private readonly IWebSearchAgent _webSearchAgent;
 
-    public CodeHelper(ICodeHelperAgent assistantAgent, IRouterAgent routerAgent, IWebSearchAgent webSearchAgent)
+    public CodeHelperEngine(ICodeHelperAgent assistantAgent, IRouterAgent routerAgent, IWebSearchAgent webSearchAgent)
     {
         _codeHelperAgent = assistantAgent;
         _routerAgent = routerAgent;

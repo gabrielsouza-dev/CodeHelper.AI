@@ -28,7 +28,6 @@ public static class WriterHelper
 
     public static async Task PrintSettings(CodeHelperOptions settings)
     {
-        Console.WriteLine();
         Console.WriteLine("Configurações do CodeHelper:");
         Console.WriteLine($"  Modelo do Agente Principal: {settings.AgentModel}");
         await Task.Delay(300);
@@ -38,6 +37,7 @@ public static class WriterHelper
         await Task.Delay(300);
         Console.WriteLine($"  Linguagem de Programação: {settings.ProgrammingLanguage}");
         await Task.Delay(3000);
+        Console.WriteLine();
     }
 
     private static void WriteCentralized(string[] lines)

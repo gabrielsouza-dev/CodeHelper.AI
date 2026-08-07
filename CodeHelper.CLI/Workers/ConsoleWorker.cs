@@ -6,10 +6,10 @@ using Microsoft.Extensions.Hosting;
 
 public class ConsoleWorker : BackgroundService
 {
-    private readonly ICodeHelper _codeHelper;
+    private readonly ICodeHelperEngine _codeHelper;
     private readonly IHostApplicationLifetime _lifetime;
 
-    public ConsoleWorker(ICodeHelper codeHelper, IHostApplicationLifetime lifetime)
+    public ConsoleWorker(ICodeHelperEngine codeHelper, IHostApplicationLifetime lifetime)
     {
         _codeHelper = codeHelper;
         _lifetime = lifetime;

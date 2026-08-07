@@ -1,13 +1,11 @@
 ﻿using CodeHelper.CLI.Helpers;
-using CodeHelper.Core;
-using CodeHelper.Core.Interfaces;
 using CodeHelper.Core.Tools;
+using CodeHelper.Extensions;
 using CodeHelper.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 ConsoleHelper.Initialize();
 
@@ -41,31 +39,16 @@ builder.Configuration
 builder.Services.Configure<CodeHelperOptions>(
     builder.Configuration.GetSection("CodeHelper"));
 
-builder.Services.Configure<WebSearchMCPOptions>(
-    builder.Configuration.GetSection("WebSearchMCP"));
+var codeHelperOptions = builder.Configuration.GetSection("CodeHelper").Get<CodeHelperOptions>()!;
+await WriterHelper.PrintSettings(codeHelperOptions);
 
-builder.Services.AddSingleton<WebSearchMCP>();
-
-var webSearchMCP = builder.Services.BuildServiceProvider().GetRequiredService<WebSearchMCP>();
+var webSearchMCPOptions = builder.Configuration.GetSection("WebSearchMCP").Get<WebSearchMCPOptions>()!;
+var webSearchMCP = new WebSearchMCP(webSearchMCPOptions);
 await webSearchMCP.StartWebSearchMCP();
 
-builder.Services.AddSingleton<ICodeHelper>((services) =>
-{
-    var settings = services.GetRequiredService<IOptions<CodeHelperOptions>>().Value;
+builder.Services.AddSingleton(webSearchMCP);
 
-    WriterHelper.PrintSettings(settings).GetAwaiter().GetResult();
-
-    var codeHelper = CodeHelperFactory
-        .ConfigureClient(settings.ApiKey, settings.ApiUrl)
-        .SelectPrincipalModel(settings.AgentModel)
-        .SelectRouterModel(settings.RouterModel)
-        .SelectWebSearchModel(settings.WebSearchModel)
-        .WithTools(webSearchMCP.Tools)
-        .WithLanguage(settings.ProgrammingLanguage)
-        .Build();
-
-    return codeHelper;
-});
+builder.Services.AddCodeHelper();
 
 builder.Services.AddHostedService<ConsoleWorker>();
 
