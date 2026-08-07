@@ -37,7 +37,13 @@ public sealed class JsonFieldStreamer
 
     public void ProcessChunk(string chunk)
     {
-        if (IsCompleted || string.IsNullOrEmpty(chunk))
+        if (IsCompleted)
+        {
+            _state = State.SearchingProperty;
+            _searchBuffer.Clear();
+        }
+
+        if (string.IsNullOrEmpty(chunk))
             return;
 
         foreach (char c in chunk)
